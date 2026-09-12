@@ -22,6 +22,7 @@ import { Switch, SwitchThumb } from '@susi-ui/react';
 
 ```
 packages/react      @susi-ui/react — the library (tsup build, vitest tests)
+apps/docs           The documentation site: guides, live examples, API tables
 apps/playground     Vite demo app + Storybook, consuming the library source directly
 ```
 
@@ -31,6 +32,7 @@ Requires **Node 22.12+** (see `.nvmrc`) and pnpm 9.
 
 ```bash
 pnpm install
+pnpm docs                 # documentation site at http://localhost:5174
 pnpm dev                  # Vite playground at http://localhost:5173
 pnpm storybook            # Storybook at http://localhost:6006
 pnpm test                 # vitest
@@ -38,8 +40,24 @@ pnpm typecheck
 pnpm build                # library dist/ + playground build
 ```
 
-The playground aliases `@susi-ui/react` to the library **source**, so changes hot-reload without a
-rebuild. The published entry point is still the bundled `dist/`.
+Both apps alias `@susi-ui/react` to the library **source**, so changes hot-reload without a rebuild
+and the documented API can never drift from the real one. The published entry point is still the
+bundled `dist/`.
+
+## Documentation
+
+`apps/docs` is the site people read before integrating: installation, styling through `data-*`
+attributes, controlled state, `asChild` composition, framework integration (Next.js, Tailwind, CSS
+Modules, testing), then a page per component with a live example, its exact source, an API table and
+the keyboard map. Every example's code is read from the demo file at build time, so the code shown is
+the code running.
+
+```bash
+pnpm --filter @susi-ui/docs build   # static site in apps/docs/dist
+```
+
+It uses hash routing and relative asset paths, so the output can be dropped on any static host —
+GitHub Pages included — with no rewrite rules.
 
 ## What's in the box
 
@@ -53,7 +71,8 @@ rebuild. The published entry point is still the bundled `dist/`.
 | Feedback | `Toast` (+ the optional `useToastQueue` helper) |
 | Display | `Progress`, `Separator`, `VisuallyHidden` |
 
-Full component API: [`packages/react/README.md`](packages/react/README.md).
+Full component API: the [docs site](apps/docs) (`pnpm docs`), or
+[`packages/react/README.md`](packages/react/README.md) for the same reference in one file.
 
 ## Design rules
 

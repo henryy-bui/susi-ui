@@ -9,6 +9,7 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "storybook": "pnpm --filter @susi-ui/playground storybook",
+    "docs": "pnpm --filter @susi-ui/docs dev",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
