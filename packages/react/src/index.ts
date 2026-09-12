@@ -7,6 +7,14 @@ export { composeRefs } from './primitive/composeRefs';
 export { composeEventHandlers } from './primitive/composeEventHandlers';
 export { createContext } from './primitive/createContext';
 export { getTabbableCandidates } from './primitive/focusable';
+export { getItems, nextIndexForKey, focusItem } from './primitive/collection';
+export {
+  useFloatingPosition,
+  type UseFloatingPositionParams,
+  type FloatingPosition,
+  type Side,
+  type Align,
+} from './primitive/useFloatingPosition';
 
 // Hooks.
 export { useControllableState, type UseControllableStateParams } from './hooks/useControllableState';
@@ -16,6 +24,8 @@ export { useIsomorphicLayoutEffect } from './hooks/useIsomorphicLayoutEffect';
 export { useEscapeKeydown } from './hooks/useEscapeKeydown';
 export { useOutsidePointerDown } from './hooks/useOutsidePointerDown';
 export { useScrollLock } from './hooks/useScrollLock';
+export { useDismiss, type UseDismissParams } from './hooks/useDismiss';
+export { useTypeahead } from './hooks/useTypeahead';
 
 // Components.
 export { Button, type ButtonProps } from './components/Button';
@@ -92,3 +102,99 @@ export {
   type PopoverArrowProps,
   type PopoverCloseProps,
 } from './components/Popover';
+
+export {
+  VisuallyHidden,
+  VISUALLY_HIDDEN_STYLE,
+  type VisuallyHiddenProps,
+} from './components/VisuallyHidden';
+export { Separator, type SeparatorProps } from './components/Separator';
+export {
+  Progress,
+  ProgressIndicator,
+  type ProgressProps,
+  type ProgressIndicatorProps,
+} from './components/Progress';
+export {
+  RadioGroup,
+  RadioGroupItem,
+  RadioGroupIndicator,
+  type RadioGroupProps,
+  type RadioGroupItemProps,
+  type RadioGroupIndicatorProps,
+} from './components/RadioGroup';
+export {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipArrow,
+  type TooltipProps,
+  type TooltipProviderProps,
+  type TooltipTriggerProps,
+  type TooltipContentProps,
+  type TooltipArrowProps,
+} from './components/Tooltip';
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuLabel,
+  DropdownMenuGroup,
+  DropdownMenuSeparator,
+  type DropdownMenuProps,
+  type DropdownMenuTriggerProps,
+  type DropdownMenuContentProps,
+  type DropdownMenuItemProps,
+  type DropdownMenuCheckboxItemProps,
+  type DropdownMenuRadioGroupProps,
+  type DropdownMenuRadioItemProps,
+  type DropdownMenuItemIndicatorProps,
+  type DropdownMenuLabelProps,
+  type DropdownMenuGroupProps,
+  type DropdownMenuSeparatorProps,
+} from './components/DropdownMenu';
+export {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectIcon,
+  SelectPortal,
+  SelectContent,
+  SelectViewport,
+  SelectItem,
+  SelectItemText,
+  SelectItemIndicator,
+  SelectGroup,
+  SelectLabel,
+  SelectSeparator,
+  type SelectProps,
+  type SelectTriggerProps,
+  type SelectValueProps,
+  type SelectIconProps,
+  type SelectContentProps,
+  type SelectViewportProps,
+  type SelectItemProps,
+  type SelectItemTextProps,
+  type SelectItemIndicatorProps,
+  type SelectGroupProps,
+  type SelectLabelProps,
+  type SelectSeparatorProps,
+} from './components/Select';
+export {
+  Slider,
+  SliderTrack,
+  SliderRange,
+  SliderThumb,
+  type SliderProps,
+  type SliderTrackProps,
+  type SliderRangeProps,
+  type SliderThumbProps,
+} from './components/Slider';

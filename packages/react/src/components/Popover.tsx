@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { useFloating, autoUpdate, offset, flip, shift, arrow, type Placement } from '@floating-ui/react-dom';
 import { Primitive } from '../primitive/Primitive';
 import { Portal, type PortalProps } from '../primitive/Portal';
 import { FocusScope } from '../primitive/FocusScope';
 import { composeEventHandlers } from '../primitive/composeEventHandlers';
 import { composeRefs } from '../primitive/composeRefs';
 import { createContext } from '../primitive/createContext';
+import { useFloatingPosition, type Align, type Side } from '../primitive/useFloatingPosition';
 import { useControllableState } from '../hooks/useControllableState';
-import { useEscapeKeydown } from '../hooks/useEscapeKeydown';
-import { useOutsidePointerDown } from '../hooks/useOutsidePointerDown';
+import { useDismiss } from '../hooks/useDismiss';
 import { useId } from '../hooks/useId';
 
 interface PopoverContextValue {
@@ -27,7 +26,6 @@ interface PopoverContextValue {
 const [PopoverProvider, usePopoverContext] = createContext<PopoverContextValue>('Popover');
 
 interface PositionContextValue {
-  placement: Placement;
   setArrow: (node: HTMLElement | null) => void;
   arrowStyles: React.CSSProperties;
 }
@@ -126,8 +124,8 @@ PopoverPortal.displayName = 'PopoverPortal';
 
 export interface PopoverContentProps extends React.ComponentPropsWithoutRef<'div'> {
   asChild?: boolean;
-  side?: 'top' | 'right' | 'bottom' | 'left';
-  align?: 'start' | 'center' | 'end';
+  side?: Side;
+  align?: Align;
   /** Distance in px between the anchor and the content. */
   sideOffset?: number;
   /** Shift along the alignment axis, in px. */
@@ -161,56 +159,36 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
   const [arrowEl, setArrowEl] = React.useState<HTMLElement | null>(null);
   const open = context.open;
 
-  const placement = (align === 'center' ? side : `${side}-${align}`) as Placement;
-
-  // Floating UI re-runs positioning whenever the middleware array identity
-  // changes, so it has to be memoised.
-  const middleware = React.useMemo(
-    () => [
-      offset({ mainAxis: sideOffset, crossAxis: alignOffset }),
-      flip({ padding: 8 }),
-      shift({ padding: 8 }),
-      ...(arrowEl ? [arrow({ element: arrowEl, padding: 4 })] : []),
-    ],
-    [sideOffset, alignOffset, arrowEl],
-  );
-
-  const { refs, floatingStyles, placement: resolvedPlacement, middlewareData } = useFloating({
-    placement,
+  const {
+    setFloating,
+    floatingStyles,
+    side: resolvedSide,
+    align: resolvedAlign,
+    arrowStyles,
+  } = useFloatingPosition({
     open,
-    whileElementsMounted: autoUpdate,
-    elements: { reference: context.reference },
-    middleware,
+    reference: context.reference,
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    arrowElement: arrowEl,
   });
 
-  useEscapeKeydown((event) => {
-    if (!open) return;
-    onEscapeKeyDown?.(event);
-    if (!event.defaultPrevented) context.setOpen(false);
+  useDismiss({
+    enabled: open,
+    refs: [context.contentRef, context.triggerRef],
+    onEscapeKeyDown,
+    onPointerDownOutside,
+    onDismiss: () => context.setOpen(false),
   });
 
-  useOutsidePointerDown(open, [context.contentRef, context.triggerRef], (event) => {
-    onPointerDownOutside?.(event);
-    if (!event.defaultPrevented) context.setOpen(false);
-  });
-
-  const arrowData = middlewareData.arrow;
   const positionContext = React.useMemo<PositionContextValue>(
-    () => ({
-      placement: resolvedPlacement,
-      setArrow: setArrowEl,
-      arrowStyles: {
-        position: 'absolute',
-        left: arrowData?.x != null ? `${arrowData.x}px` : undefined,
-        top: arrowData?.y != null ? `${arrowData.y}px` : undefined,
-      },
-    }),
-    [resolvedPlacement, arrowData?.x, arrowData?.y],
+    () => ({ setArrow: setArrowEl, arrowStyles }),
+    [arrowStyles],
   );
 
   if (!open) return null;
-
-  const [resolvedSide, resolvedAlign = 'center'] = resolvedPlacement.split('-');
 
   return (
     <PositionProvider value={positionContext}>
@@ -225,7 +203,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
         onUnmountAutoFocus={onCloseAutoFocus}
         style={{ ...floatingStyles, ...style }}
         {...props}
-        ref={composeRefs(forwardedRef, context.contentRef, refs.setFloating as React.Ref<HTMLDivElement>)}
+        ref={composeRefs(forwardedRef, context.contentRef, setFloating as React.Ref<HTMLDivElement>)}
       >
         {children}
       </FocusScope>

@@ -6,8 +6,7 @@ import { composeEventHandlers } from '../primitive/composeEventHandlers';
 import { composeRefs } from '../primitive/composeRefs';
 import { createContext } from '../primitive/createContext';
 import { useControllableState } from '../hooks/useControllableState';
-import { useEscapeKeydown } from '../hooks/useEscapeKeydown';
-import { useOutsidePointerDown } from '../hooks/useOutsidePointerDown';
+import { useDismiss } from '../hooks/useDismiss';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { useId } from '../hooks/useId';
 
@@ -125,15 +124,12 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 
   useScrollLock(open && context.modal);
 
-  useEscapeKeydown((event) => {
-    if (!open) return;
-    onEscapeKeyDown?.(event);
-    if (!event.defaultPrevented) context.setOpen(false);
-  });
-
-  useOutsidePointerDown(open, [context.contentRef, context.triggerRef], (event) => {
-    onPointerDownOutside?.(event);
-    if (!event.defaultPrevented) context.setOpen(false);
+  useDismiss({
+    enabled: open,
+    refs: [context.contentRef, context.triggerRef],
+    onEscapeKeyDown,
+    onPointerDownOutside,
+    onDismiss: () => context.setOpen(false),
   });
 
   if (!open) return null;

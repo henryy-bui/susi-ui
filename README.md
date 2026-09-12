@@ -45,9 +45,12 @@ rebuild. The published entry point is still the bundled `dist/`.
 
 | Area | Exports |
 | --- | --- |
-| Primitives | `Slot`, `Primitive`, `Portal`, `FocusScope`, `composeRefs`, `composeEventHandlers`, `createContext`, `getTabbableCandidates` |
-| Hooks | `useControllableState`, `useCallbackRef`, `useId`, `useIsomorphicLayoutEffect`, `useEscapeKeydown`, `useOutsidePointerDown`, `useScrollLock` |
-| Components | `Button`, `Toggle`, `Checkbox`, `Switch`, `Collapsible`, `Accordion`, `Tabs`, `Dialog`, `Popover` |
+| Primitives | `Slot`, `Primitive`, `Portal`, `FocusScope`, `composeRefs`, `composeEventHandlers`, `createContext`, `getTabbableCandidates`, `getItems`, `nextIndexForKey`, `useFloatingPosition` |
+| Hooks | `useControllableState`, `useCallbackRef`, `useId`, `useIsomorphicLayoutEffect`, `useEscapeKeydown`, `useOutsidePointerDown`, `useDismiss`, `useTypeahead`, `useScrollLock` |
+| Controls | `Button`, `Toggle`, `Checkbox`, `Switch`, `RadioGroup`, `Slider` |
+| Disclosure | `Collapsible`, `Accordion`, `Tabs` |
+| Overlays | `Dialog`, `Popover`, `Tooltip`, `DropdownMenu`, `Select` |
+| Display | `Progress`, `Separator`, `VisuallyHidden` |
 
 Full component API: [`packages/react/README.md`](packages/react/README.md).
 
@@ -70,3 +73,6 @@ Full component API: [`packages/react/README.md`](packages/react/README.md).
 - The two `optionalDependencies` in the root `package.json` are darwin-arm64 native bindings for
   rolldown and oxc that pnpm otherwise misses; they're skipped automatically on other platforms.
 - No linter is configured yet — TypeScript in strict mode plus the test suite are the current gates.
+- The tests run slowly (~90s): Floating UI's collision detection leans on `getComputedStyle`, which
+  is very slow under jsdom. It's an environment artifact, not a runtime cost.
+- Not built yet: `Toast`, `Combobox`, `ContextMenu`, `NavigationMenu`, `HoverCard`, `Avatar`.

@@ -19,12 +19,45 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Popover,
   PopoverArrow,
   PopoverClose,
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
+  Progress,
+  ProgressIndicator,
+  RadioGroup,
+  RadioGroupIndicator,
+  RadioGroupItem,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectIcon,
+  SelectItem,
+  SelectItemIndicator,
+  SelectItemText,
+  SelectLabel,
+  SelectPortal,
+  SelectTrigger,
+  SelectValue,
+  SelectViewport,
+  Separator,
+  Slider,
+  SliderRange,
+  SliderThumb,
+  SliderTrack,
   Switch,
   SwitchThumb,
   Tabs,
@@ -32,12 +65,19 @@ import {
   TabsList,
   TabsTrigger,
   Toggle,
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
   type CheckedState,
 } from '@susi-ui/react';
 
 export function App() {
   return (
-    <main className="page">
+    <TooltipProvider>
+      <main className="page">
       <header>
         <h1>susi-ui</h1>
         <p>Headless React primitives. Every style on this page lives in the app, not the library.</p>
@@ -47,12 +87,19 @@ export function App() {
       <ToggleDemo />
       <CheckboxDemo />
       <SwitchDemo />
+      <RadioGroupDemo />
+      <SliderDemo />
+      <ProgressDemo />
       <AccordionDemo />
       <CollapsibleDemo />
       <TabsDemo />
       <DialogDemo />
       <PopoverDemo />
-    </main>
+      <TooltipDemo />
+      <MenuDemo />
+      <SelectDemo />
+      </main>
+    </TooltipProvider>
   );
 }
 
@@ -254,6 +301,167 @@ function PopoverDemo() {
             </PopoverContent>
           </PopoverPortal>
         </Popover>
+      </div>
+    </Section>
+  );
+}
+
+function RadioGroupDemo() {
+  return (
+    <Section title="Radio group">
+      <RadioGroup className="row" aria-label="Plan" defaultValue="pro" name="plan">
+        {['free', 'pro', 'team'].map((plan) => (
+          <label className="field" key={plan}>
+            <RadioGroupItem className="radio" value={plan}>
+              <RadioGroupIndicator className="radio-indicator" />
+            </RadioGroupItem>
+            {plan}
+          </label>
+        ))}
+      </RadioGroup>
+    </Section>
+  );
+}
+
+function SliderDemo() {
+  const [range, setRange] = useState([20, 70]);
+  return (
+    <Section title="Slider">
+      <div className="row" style={{ gap: 32 }}>
+        <Slider className="slider" defaultValue={[40]} aria-label="Volume">
+          <SliderTrack className="slider-track">
+            <SliderRange className="slider-range" />
+          </SliderTrack>
+          <SliderThumb className="slider-thumb" aria-label="Volume" />
+        </Slider>
+
+        <Slider className="slider" value={range} onValueChange={setRange} step={5}>
+          <SliderTrack className="slider-track">
+            <SliderRange className="slider-range" />
+          </SliderTrack>
+          <SliderThumb className="slider-thumb" index={0} aria-label="Minimum" />
+          <SliderThumb className="slider-thumb" index={1} aria-label="Maximum" />
+        </Slider>
+        <span className="state">{range.join(' – ')}</span>
+      </div>
+    </Section>
+  );
+}
+
+function ProgressDemo() {
+  const [value, setValue] = useState<number | null>(35);
+  return (
+    <Section title="Progress">
+      <div className="row">
+        <Progress className="progress" value={value} getValueLabel={(v, max) => `${v} of ${max}`}>
+          <ProgressIndicator className="progress-indicator" />
+        </Progress>
+        <Button className="btn" onClick={() => setValue((v) => (v === null ? 35 : v >= 100 ? 0 : v + 20))}>
+          Advance
+        </Button>
+        <Button className="btn" onClick={() => setValue((v) => (v === null ? 35 : null))}>
+          Toggle indeterminate
+        </Button>
+      </div>
+    </Section>
+  );
+}
+
+function TooltipDemo() {
+  return (
+    <Section title="Tooltip">
+      <div className="row">
+        {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
+          <Tooltip key={side}>
+            <TooltipTrigger className="btn">{side}</TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent className="tooltip" side={side}>
+                <TooltipArrow className="tooltip-arrow" />
+                Opens on hover, and on keyboard focus.
+              </TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function MenuDemo() {
+  const [showHidden, setShowHidden] = useState(true);
+  const [sort, setSort] = useState('name');
+
+  return (
+    <Section title="Dropdown menu">
+      <div className="row">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="btn">Actions</DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent className="menu">
+              <DropdownMenuItem className="menu-item">New file</DropdownMenuItem>
+              <DropdownMenuItem className="menu-item">Duplicate</DropdownMenuItem>
+              <DropdownMenuItem className="menu-item" disabled>
+                Archive
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="menu-separator" />
+              <DropdownMenuCheckboxItem
+                className="menu-item"
+                checked={showHidden}
+                onCheckedChange={setShowHidden}
+              >
+                Show hidden files
+                <DropdownMenuItemIndicator className="menu-indicator">✓</DropdownMenuItemIndicator>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator className="menu-separator" />
+              <DropdownMenuLabel className="menu-label">Sort by</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
+                {['name', 'date', 'size'].map((option) => (
+                  <DropdownMenuRadioItem className="menu-item" key={option} value={option}>
+                    {option}
+                    <DropdownMenuItemIndicator className="menu-indicator">•</DropdownMenuItemIndicator>
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
+        <span className="state">
+          sort: {sort} · hidden: {String(showHidden)}
+        </span>
+      </div>
+    </Section>
+  );
+}
+
+const FRUITS = ['Apple', 'Banana', 'Cherry', 'Dragon fruit', 'Elderberry'];
+
+function SelectDemo() {
+  const [value, setValue] = useState<string>();
+  return (
+    <Section title="Select">
+      <div className="row">
+        <Select value={value} onValueChange={setValue} name="fruit">
+          <SelectTrigger className="select-trigger" aria-label="Fruit">
+            <SelectValue placeholder="Pick a fruit" />
+            <SelectIcon>⌄</SelectIcon>
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectContent className="menu select-content">
+              <SelectViewport className="select-viewport">
+                <SelectGroup>
+                  <SelectLabel className="menu-label">Fruit</SelectLabel>
+                  {FRUITS.map((fruit) => (
+                    <SelectItem className="menu-item" key={fruit} value={fruit.toLowerCase()}>
+                      <SelectItemText>{fruit}</SelectItemText>
+                      <SelectItemIndicator className="menu-indicator">✓</SelectItemIndicator>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectViewport>
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+        <span className="state">value: {value ?? 'none'}</span>
       </div>
     </Section>
   );

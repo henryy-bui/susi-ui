@@ -20,7 +20,8 @@ Every component follows the same three rules:
 | `data-state` | `on/off`, `checked/unchecked/indeterminate`, `open/closed`, `active/inactive` |
 | `data-disabled` | present when disabled |
 | `data-orientation` | `Tabs`, `Accordion` |
-| `data-side` / `data-align` | `PopoverContent`, after collision handling |
+| `data-side` / `data-align` | anchored content (`Popover`, `Tooltip`, menus), after collision handling |
+| `data-placeholder` | `SelectTrigger` / `SelectValue` while nothing is selected |
 
 **Controlled or uncontrolled.** Pass `checked` / `open` / `value` to control it, or
 `defaultChecked` / `defaultOpen` / `defaultValue` to let it own the state. The change callback fires
@@ -163,6 +164,144 @@ Positioned with Floating UI (`offset`, `flip`, `shift`), so it stays on screen; 
 placement comes back as `data-side` / `data-align`. Use `PopoverAnchor` to position against
 something other than the trigger, and `trapFocus` (or `modal` on the root) to trap focus.
 
+### RadioGroup
+
+```tsx
+<RadioGroup value={plan} onValueChange={setPlan} name="plan">
+  <RadioGroupItem value="pro">
+    <RadioGroupIndicator />
+  </RadioGroupItem>
+</RadioGroup>
+```
+
+Arrow keys move between items *and* select, as the radio pattern requires; disabled items are
+skipped and the group keeps a single tab stop. With a `name`, hidden radio inputs mirror the value
+for native form submission.
+
+### Slider
+
+```tsx
+<Slider value={range} onValueChange={setRange} onValueCommit={save} step={5}>
+  <SliderTrack>
+    <SliderRange />
+  </SliderTrack>
+  <SliderThumb index={0} aria-label="Minimum" />
+  <SliderThumb index={1} aria-label="Maximum" />
+</Slider>
+```
+
+One number per thumb; thumbs cannot cross each other. Dragging the track moves the nearest thumb,
+and arrows, PageUp/PageDown, Home and End work on a focused thumb. Positioning is left to CSS:
+
+```css
+.slider-thumb { position: absolute; left: var(--susi-slider-percent); transform: translateX(-50%); }
+.slider-range { left: var(--susi-slider-range-start); right: calc(100% - var(--susi-slider-range-end)); }
+```
+
+`onValueChange` fires on every step; `onValueCommit` fires when the interaction settles.
+
+### Tooltip
+
+```tsx
+<TooltipProvider delayDuration={400} skipDelayDuration={300}>
+  <Tooltip>
+    <TooltipTrigger>Save</TooltipTrigger>
+    <TooltipPortal>
+      <TooltipContent side="top">
+        <TooltipArrow />
+        Saves your work
+      </TooltipContent>
+    </TooltipPortal>
+  </Tooltip>
+</TooltipProvider>
+```
+
+Opens on hover and on keyboard focus — not on a pointer press, which is the user acting rather than
+asking. `TooltipProvider` is optional and shares timing across a group: once one tooltip has been
+shown, neighbouring triggers skip the delay. Escape closes; content is `pointer-events: none` unless
+you pass `hoverable`.
+
+### DropdownMenu
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>Actions</DropdownMenuTrigger>
+  <DropdownMenuPortal>
+    <DropdownMenuContent>
+      <DropdownMenuItem onSelect={rename}>Rename</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuCheckboxItem checked={showHidden} onCheckedChange={setShowHidden}>
+        Show hidden
+        <DropdownMenuItemIndicator>✓</DropdownMenuItemIndicator>
+      </DropdownMenuCheckboxItem>
+      <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
+        <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
+      </DropdownMenuRadioGroup>
+    </DropdownMenuContent>
+  </DropdownMenuPortal>
+</DropdownMenu>
+```
+
+ArrowDown/ArrowUp on the trigger open the menu focused on the first or last item; inside, arrows
+wrap, typing jumps to an item, hovering focuses, Tab and Escape dismiss, and focus returns to the
+trigger. `onSelect` runs before the menu closes — call `preventDefault()` on its event to keep the
+menu open. Item state is yours to own: the content unmounts when closed, so control `checked` and
+radio `value` from outside if they need to survive.
+
+### Select
+
+```tsx
+<Select value={fruit} onValueChange={setFruit} name="fruit">
+  <SelectTrigger>
+    <SelectValue placeholder="Pick a fruit" />
+    <SelectIcon>⌄</SelectIcon>
+  </SelectTrigger>
+  <SelectPortal>
+    <SelectContent>
+      <SelectViewport>
+        <SelectGroup>
+          <SelectLabel>Fruit</SelectLabel>
+          <SelectItem value="apple">
+            <SelectItemText>Apple</SelectItemText>
+            <SelectItemIndicator>✓</SelectItemIndicator>
+          </SelectItem>
+        </SelectGroup>
+      </SelectViewport>
+    </SelectContent>
+  </SelectPortal>
+</Select>
+```
+
+A listbox: opens on click, Enter, Space or arrows, opens focused on the current selection, supports
+typeahead, and closes on selection or Escape. `SelectContent` publishes `--susi-anchor-width` (the
+trigger's width, unless `matchTriggerWidth={false}`) and `--susi-available-height`, so the viewport
+can be sized in CSS:
+
+```css
+.select-content { width: var(--susi-anchor-width); }
+.select-viewport { max-height: min(280px, var(--susi-available-height)); overflow-y: auto; }
+```
+
+`SelectValue` renders the selected item's text, which items register as they mount. Before the list
+has ever opened only the raw value is known, so pass `children` to `SelectValue` if you need exact
+control over what the trigger shows.
+
+### Progress
+
+```tsx
+<Progress value={35} getValueLabel={(v, max) => `${v} of ${max} uploaded`}>
+  <ProgressIndicator />
+</Progress>
+```
+
+`value={null}` means indeterminate. The indicator publishes `--susi-progress-percent`.
+
+### Separator and VisuallyHidden
+
+`<Separator />` is decorative by default (`role="none"`); pass `decorative={false}` for a semantic
+one. `<VisuallyHidden>` hides content visually while keeping it for screen readers, and exports its
+style object as `VISUALLY_HIDDEN_STYLE`.
+
 ## Primitives and hooks
 
 These are the parts to reach for when building your own components:
@@ -173,6 +312,11 @@ These are the parts to reach for when building your own components:
 - `FocusScope` — focus trap with focus-on-mount and restore-on-unmount.
 - `composeRefs`, `composeEventHandlers`, `createContext` (typed context + a hook that throws a
   useful error outside its root), `getTabbableCandidates`.
+- `useFloatingPosition` — the Floating UI wiring behind every anchored overlay: pass an anchor and a
+  side/align, get back styles plus the resolved placement after collisions.
+- `getItems` / `nextIndexForKey` / `focusItem` — list navigation over DOM items, and `useTypeahead`
+  for type-to-select.
+- `useDismiss` — Escape plus outside-pointer dismissal, each cancelable by the consumer.
 - `useControllableState`, `useCallbackRef`, `useId`, `useIsomorphicLayoutEffect`,
   `useEscapeKeydown`, `useOutsidePointerDown`, `useScrollLock` (reference counted).
 
