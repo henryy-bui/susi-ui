@@ -1,0 +1,25 @@
+{
+  "name": "susi-ui",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "storybook": "pnpm --filter @susi-ui/playground storybook",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.12",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-darwin-arm64": "1.2.8",
+    "@oxc-parser/binding-darwin-arm64": "0.127.0"
+  }
+}
