@@ -13,4 +13,22 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   } as unknown as typeof ResizeObserver;
 }
 
+// jsdom has no PointerEvent either, so pointer events would arrive without
+// `button` or coordinates — enough to break any pointer-driven behaviour.
+if (typeof globalThis.PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    readonly pointerId: number;
+    readonly pointerType: string;
+    readonly isPrimary: boolean;
+
+    constructor(type: string, params: PointerEventInit = {}) {
+      super(type, params);
+      this.pointerId = params.pointerId ?? 1;
+      this.pointerType = params.pointerType ?? 'mouse';
+      this.isPrimary = params.isPrimary ?? true;
+    }
+  }
+  globalThis.PointerEvent = PointerEventPolyfill as unknown as typeof PointerEvent;
+}
+
 afterEach(cleanup);

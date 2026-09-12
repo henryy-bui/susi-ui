@@ -286,6 +286,63 @@ can be sized in CSS:
 has ever opened only the raw value is known, so pass `children` to `SelectValue` if you need exact
 control over what the trigger shows.
 
+### Toast
+
+```tsx
+<ToastProvider duration={5000} swipeDirection="right">
+  <Toast open={open} onOpenChange={setOpen}>
+    <ToastTitle>Changes saved</ToastTitle>
+    <ToastDescription>Your project is up to date.</ToastDescription>
+    <ToastAction altText="Undo from the History menu">Undo</ToastAction>
+    <ToastClose aria-label="Dismiss">×</ToastClose>
+  </Toast>
+  <ToastViewport />
+</ToastProvider>
+```
+
+Toasts are declared wherever they make sense in your tree and render into the `ToastViewport`,
+which is the live region — so it exists before any toast does and insertions get announced. Put the
+viewport once, near the end of your app; position it with CSS.
+
+- **Auto-dismiss** after `duration` (provider default 5000ms, `Infinity` to disable), paused while
+  the viewport is hovered or holds focus, and resumed with the *remaining* time, not a fresh clock.
+- **Swipe to dismiss** in `swipeDirection` past `swipeThreshold` px. The root carries
+  `data-swipe="start | move | cancel | end"` and publishes `--susi-toast-swipe-move-x` / `-y`:
+
+  ```css
+  .toast[data-swipe='move'] { transform: translateX(var(--susi-toast-swipe-move-x)); transition: none; }
+  .toast[data-swipe='cancel'] { transform: translateX(0); transition: transform 160ms ease-out; }
+  ```
+
+- **Escape** closes a focused toast (cancelable via `onEscapeKeyDown`), and the viewport hotkey
+  (F8 by default) moves focus to it.
+- `type="foreground"` (default) announces assertively for things the user must know now;
+  `type="background"` waits its turn.
+- `ToastAction` requires `altText`: how to do the same thing without the toast, since a toast may
+  vanish before a screen reader user reaches it. It closes the toast unless you pass `keepOpen`.
+
+#### useToastQueue
+
+The components are declarative, so something has to own the list. `useToastQueue` is an optional
+helper for exactly that — no styling, no globals:
+
+```tsx
+const queue = useToastQueue<{ title: string }>({ limit: 3 });
+
+queue.add({ title: 'Saved' });        // returns an id
+queue.dismiss(id);                    // closes, then removes after removeDelay
+queue.update(id, { title: 'Saved!' });
+queue.clear();
+
+queue.toasts.map((toast) => (
+  <Toast key={toast.id} open={toast.open} onOpenChange={(open) => !open && queue.dismiss(toast.id)}>
+    <ToastTitle>{toast.data.title}</ToastTitle>
+  </Toast>
+));
+```
+
+`dismiss` keeps the toast mounted for `removeDelay` ms so it can animate out.
+
 ### Progress
 
 ```tsx

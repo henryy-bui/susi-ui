@@ -64,6 +64,13 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
   Toggle,
   Tooltip,
   TooltipArrow,
@@ -71,6 +78,7 @@ import {
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
+  useToastQueue,
   type CheckedState,
 } from '@susi-ui/react';
 
@@ -98,6 +106,7 @@ export function App() {
       <TooltipDemo />
       <MenuDemo />
       <SelectDemo />
+      <ToastDemo />
       </main>
     </TooltipProvider>
   );
@@ -463,6 +472,58 @@ function SelectDemo() {
         </Select>
         <span className="state">value: {value ?? 'none'}</span>
       </div>
+    </Section>
+  );
+}
+
+interface Notice {
+  title: string;
+  description: string;
+}
+
+function ToastDemo() {
+  const queue = useToastQueue<Notice>({ limit: 3 });
+
+  return (
+    <Section title="Toast">
+      <ToastProvider duration={5000} swipeDirection="right">
+        <div className="row">
+          <Button
+            className="btn"
+            onClick={() =>
+              queue.add({ title: 'Changes saved', description: 'Your project is up to date.' })
+            }
+          >
+            Show toast
+          </Button>
+          <Button className="btn" onClick={queue.clear}>
+            Clear all
+          </Button>
+          <span className="state">
+            Hover to pause · swipe right to dismiss · F8 focuses the viewport
+          </span>
+        </div>
+
+        {queue.toasts.map((toast) => (
+          <Toast
+            className="toast"
+            key={toast.id}
+            open={toast.open}
+            onOpenChange={(open) => !open && queue.dismiss(toast.id)}
+          >
+            <ToastTitle className="toast-title">{toast.data.title}</ToastTitle>
+            <ToastDescription className="toast-description">{toast.data.description}</ToastDescription>
+            <ToastAction className="btn toast-action" altText="Undo from the History menu">
+              Undo
+            </ToastAction>
+            <ToastClose className="btn" aria-label="Dismiss">
+              ×
+            </ToastClose>
+          </Toast>
+        ))}
+
+        <ToastViewport className="toast-viewport" />
+      </ToastProvider>
     </Section>
   );
 }

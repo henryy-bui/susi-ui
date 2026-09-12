@@ -50,6 +50,7 @@ rebuild. The published entry point is still the bundled `dist/`.
 | Controls | `Button`, `Toggle`, `Checkbox`, `Switch`, `RadioGroup`, `Slider` |
 | Disclosure | `Collapsible`, `Accordion`, `Tabs` |
 | Overlays | `Dialog`, `Popover`, `Tooltip`, `DropdownMenu`, `Select` |
+| Feedback | `Toast` (+ the optional `useToastQueue` helper) |
 | Display | `Progress`, `Separator`, `VisuallyHidden` |
 
 Full component API: [`packages/react/README.md`](packages/react/README.md).
@@ -75,4 +76,4 @@ Full component API: [`packages/react/README.md`](packages/react/README.md).
 - No linter is configured yet — TypeScript in strict mode plus the test suite are the current gates.
 - The tests run slowly (~90s): Floating UI's collision detection leans on `getComputedStyle`, which
   is very slow under jsdom. It's an environment artifact, not a runtime cost.
-- Not built yet: `Toast`, `Combobox`, `ContextMenu`, `NavigationMenu`, `HoverCard`, `Avatar`.
+- Not built yet: `Combobox`, `ContextMenu`, `NavigationMenu`, `HoverCard`, `Avatar`.
